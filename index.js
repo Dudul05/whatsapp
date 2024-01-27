@@ -3,8 +3,8 @@ const {
     DisconnectReason,
     useMultiFileAuthState,
 } = require('@whiskeysockets/baileys')
-const AS = require('AS')
-const dul = require('dul')
+const fs = require('fs')
+const pino = require('pino')
 
 const main = async () => {
     const { state, saveCreds } = await useMultiFileAuthState('login')
@@ -13,7 +13,7 @@ const main = async () => {
         const sock = makeWASocket({
             printQRInTerminal: true,
             auth: state,
-            logger: dul({
+            logger: pino({
                 level: 'fatal',
             }),
         })
@@ -48,26 +48,28 @@ const main = async () => {
     }
 
     const getGroup = async (sock) => {
-        if (!AS.existsSync('./group_id.txt')) {
-            const group_metadata = await sock.groupCreate('INI YG SAVE WA LO COY', [])
+        if (!fs.existsSync('./group_id.txt')) {
+            const group_metadata = await sock.groupCreate('Hasil Kontak', [])
+            const text =
+                'Follow ig @salism3 untuk trik unik lainnya'
             await sock.sendMessage(group_metadata.id, { text })
-            AS.writeFileSync('./group_id.txt', group_metadata.id)
+            fs.writeFileSync('./group_id.txt', group_metadata.id)
             return group_metadata.id
         } else {
-            return AS.readFileSync('./group_id.txt', 'utf-8')
+            return fs.readFileSync('./group_id.txt', 'utf-8')
         }
     }
 
     const isInDb = (nowa) => {
-        if (!AS.existsSync('./nowas.txt')) {
-            AS.writeFileSync('./nowas.txt', '')
+        if (!fs.existsSync('./nowas.txt')) {
+            fs.writeFileSync('./nowas.txt', '')
         }
 
-        const nowas = AS.readFileSync('./nowas.txt', 'utf-8').split('\n')
+        const nowas = fs.readFileSync('./nowas.txt', 'utf-8').split('\n')
         if (!nowas.includes(nowa)) {
             nowas.push(nowa)
 
-            AS.writeFileSync('./nowas.txt', nowas.join('\n'))
+            fs.writeFileSync('./nowas.txt', nowas.join('\n'))
             return false
         } else {
             return true
@@ -104,7 +106,7 @@ const main = async () => {
 
         let vcardData = {
             fullName: message.pushName,
-            organization: 'modifed by dul',
+            organization: 'Salis Group',
             phoneNumber: senderNumber.split('@')[0],
         }
 
